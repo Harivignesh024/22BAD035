@@ -1,0 +1,10 @@
+### Try Primes
+GET http://localhost:3000/numbers/p
+
+### Try Fibo
+GET http://localhost:3000/numbers/f
+
+### Try Invalid ID
+GET http://localhost:3000/numbers/x
+GET http://20.244.56.144/test/primes
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6...

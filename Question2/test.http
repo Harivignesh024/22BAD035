@@ -1,0 +1,12 @@
+### Test average price
+GET http://localhost:9876/stocks/NVDA?minutes=30&aggregation=average
+
+### Test correlation
+GET http://localhost:9876/stockcorrelation?minutes=30&ticker=NVDA&ticker=PYPL
+
+### Test invalid correlation
+GET http://localhost:9876/stockcorrelation?minutes=30&ticker=NVDA
+
+### Test invalid average query
+GET http://localhost:9876/stocks/NVDA?aggregation=average
+

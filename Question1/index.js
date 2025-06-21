@@ -1,15 +1,15 @@
 const express = require("express");
 const axios = require("axios");
-const { token } = require("./token"); // 🛡️ Load token from token.js
+const { token } = require("./token"); // Load your saved auth token
 
 const app = express();
 const PORT = 3000;
 
-// This array keeps track of the last 10 unique numbers
+// Stores the last 10 unique numbers
 let numberWindow = [];
 const MAX_WINDOW_SIZE = 10;
 
-// Just mapping short IDs to API endpoints
+// Maps short ID to the actual API type
 const idToType = {
   p: "primes",
   f: "fibo",
@@ -17,8 +17,9 @@ const idToType = {
   r: "rand"
 };
 
+// Function to fetch numbers from the test server
 async function fetchNumbers(type) {
-  const url = `http://20.244.56.144/test/${type}`;
+  const url = `http://20.244.56.144/evaluation-service/${type}`;
   console.log(`➡️ Requesting: ${url}`);
 
   try {
@@ -30,65 +31,60 @@ async function fetchNumbers(type) {
       }
     });
 
-    if (
-      !response.data ||
-      !Array.isArray(response.data.numbers) ||
-      response.data.numbers.length === 0
-    ) {
-      console.log("ℹ️ Test server responded, but no numbers were returned.");
+    const numbers = response.data.numbers || [];
+
+    if (numbers.length === 0) {
+      console.log("ℹ️ No numbers returned by API.");
     } else {
-      console.log("✅ API Response:", response.data.numbers);
+      console.log("✅ Received numbers:", numbers);
     }
 
-    return response.data.numbers || [];
+    return numbers;
   } catch (error) {
-    console.log("ℹ️ No response from test server or invalid response received.");
+    console.log("ℹ️ No response from test server or invalid response.");
     return [];
   }
 }
 
-
-
-// Route that handles incoming requests for number data
+// Route handler for /numbers/:id
 app.get("/numbers/:id", async (req, res) => {
   const id = req.params.id;
   const type = idToType[id];
 
-  // If the ID is not valid, send a bad request error
+  // If ID is invalid, return error
   if (!type) {
     return res.status(400).json({ error: "Invalid number ID" });
   }
 
-  // Take a snapshot of the current state before making any changes
+  // Copy current window before adding new numbers
   const windowPrevState = [...numberWindow];
 
-  // Call the fetcher to get new numbers from the test server
+  // Fetch numbers from 3rd-party API
   const newNumbers = await fetchNumbers(type);
 
-  // Add numbers only if they are unique and maintain window size
+  // Add only unique numbers and maintain window size
   newNumbers.forEach((num) => {
     if (!numberWindow.includes(num)) {
       numberWindow.push(num);
 
-      // If we cross the max size, remove the oldest entry
+      // Remove oldest if window exceeds limit
       if (numberWindow.length > MAX_WINDOW_SIZE) {
         numberWindow.shift();
       }
     }
   });
 
-  // Calculate the average of numbers in the window
+  // Calculate average of current window
   const avg =
     numberWindow.length > 0
       ? parseFloat(
           (
-            numberWindow.reduce((acc, val) => acc + val, 0) /
-            numberWindow.length
+            numberWindow.reduce((sum, val) => sum + val, 0) / numberWindow.length
           ).toFixed(2)
         )
       : 0;
 
-  // Final response sent back to the user
+  // Send the response
   res.json({
     windowPrevState,
     windowCurrState: numberWindow,

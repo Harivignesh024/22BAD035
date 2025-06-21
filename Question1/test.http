@@ -1,10 +1,14 @@
-### Try Primes
+### Test Primes API
 GET http://localhost:3000/numbers/p
 
-### Try Fibo
+### Test Fibonacci API
 GET http://localhost:3000/numbers/f
 
-### Try Invalid ID
+### Test Even Numbers API
+GET http://localhost:3000/numbers/e
+
+### Test Random Numbers API
+GET http://localhost:3000/numbers/r
+
+### Test Invalid ID
 GET http://localhost:3000/numbers/x
-GET http://20.244.56.144/test/primes
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6...
